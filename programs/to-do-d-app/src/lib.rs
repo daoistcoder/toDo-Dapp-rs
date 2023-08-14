@@ -22,7 +22,14 @@ pub mod clever_todo {
         pub fn initialize_user(
             ctx: Context<InitializeUser>
         ) -> Result<()> {
-            // Initialize USER_PROFILE with default data           
+            // Initialize USER_PROFILE with default data
+            let user_profile = &mut ctx.accounts.user_profile; // declared user_profile var as the val from InitializeUser struct
+
+            user_profile.authority = ctx.acccounts.authority.key(); 
+            
+            user_profile.last_todo = 0;
+
+            user_profile.todo_count = 0;
         }
 
 
@@ -53,4 +60,6 @@ pub struct InitializeUser<'info> {
     )]
     // Box -> place to store memory
     pub user_profile: Box<Account<'info, UserProfile>>,
+
+    pub system_program: Program<'info, System>,
 }
