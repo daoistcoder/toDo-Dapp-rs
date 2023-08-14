@@ -64,8 +64,21 @@ pub mod clever_todo {
         }
         
         // * MARK a toDo
-            // - UPDATE the STATE of a toDo in the blockchain
-        
+        // - UPDATE the STATE of a toDo in the blockchain
+        pub fn mark_todo(
+            ctx: Context<MarkTodo>,
+            todo_idx: u8,
+        ) -> Result<()> {
+            // CHANGE marked to TRUE -> mark todo as completed!
+            let todo_account = &mut ctx.accounts.todo_account;
+            require!(!todo_account.marked, TodoError::AlreadyMarked);
+
+            // Mark Todo
+            todo_account.marked = true;
+
+            Ok(())
+        }
+            
         // * DELETE toDo
             // - REMOVE a toDo in the blockchain
 }
@@ -108,6 +121,32 @@ pub struct AddTodo<'info> {
         bump,
         payer = authority,
         space = std::mem::size_of::<TodoAccount>() + 8,
+    )]
+    pub todo_account: Box<Account<'info, TodoAccount>>,
+
+    #[account(mut)]
+    pub authority: Signer<'info>,
+
+    pub system_program: Program<'info, System>,
+}
+
+// MarkTodo Struct
+#[derive(Accounts)]
+#[instruction(todo_idx: u8)]
+pub struct MarkTodo<'info> {
+    #[account(
+        mut,
+        seeds = [USER_TAG, authority.key().as_ref()],
+        bump,
+        has_one = authority
+    )]
+    pub user_profile: Box<Account<'info, UserProfile>>,
+
+    #[account(
+        mut,
+        seeds = [TODO_TAG, authority.key().as_ref(), &[todo_idx].as_ref()],
+        bump,
+        has_one = authority,
     )]
     pub todo_account: Box<Account<'info, TodoAccount>>,
 
