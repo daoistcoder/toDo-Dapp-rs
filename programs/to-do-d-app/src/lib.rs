@@ -81,6 +81,22 @@ pub mod clever_todo {
             
         // * DELETE toDo
             // - REMOVE a toDo in the blockchain
+        pub fn remove_todo(
+            ctx: Context<RemoveTodo>,
+            todo_idx: u8,
+        ) -> Result<()> {
+            // DECREMENT the total_todo count
+            let user_profile = &mut ctx.accounts.user_profile;
+
+            // access todo_count and use .checked_sub(1) to decrement its value
+            user_profile.todo_count = user_profile.todo_count
+            .checked_sub(1)
+            .unwrap();
+
+            // * Note NO need to decrement last_todo as todo_account{idx} PDA already closed in Context<>
+            
+            Ok(())
+        }
 }
 
 #[derive(Accounts)]
@@ -153,5 +169,33 @@ pub struct MarkTodo<'info> {
     #[account(mut)]
     pub authority: Signer<'info>,
 
+    pub system_program: Program<'info, System>,
+}
+
+// RemoveTodo Struct
+#[derive(Accounts)]
+#[instruction(todo_idx: u8)]
+pub struct RemoveTodo<'info> {
+    #[account(
+        mut,
+        seeds = [USER_TAG, authority.key().as_ref()],
+        bump,
+        has_one = authority
+    )]
+    pub user_profile: Box<Account<'info, UserProfile>>,
+
+    // close -> property to close the todo_account base on todo_idx in Context scope
+    #[account(
+        mut,
+        close = authority,
+        seeds = [TODO_TAG, authority.key().as_ref(), &[todo_idx].as_ref()],
+        bump,
+        has_one = authority,
+    )]
+    pub todo_account: Box<Account<'info, TodoAccount>>,
+
+    #[account(mut)]
+    pub authority: Signer<'info>,
+    
     pub system_program: Program<'info, System>,
 }
