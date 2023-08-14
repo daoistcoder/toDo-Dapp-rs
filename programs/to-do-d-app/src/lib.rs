@@ -56,7 +56,7 @@ pub struct InitializeUser<'info> {
         seeds = [USER_TAG,authority.key().as_ref()],
         bump,
         payer = authority,
-        space = 8 + std::mem:size_of::<UserProfile>(),
+        space = 8 + std::mem::size_of::<UserProfile>(),
     )]
     // Box -> place to store memory
     pub user_profile: Box<Account<'info, UserProfile>>,
