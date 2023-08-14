@@ -9,7 +9,7 @@ pub mod states;
     // * use crate brings l1-l13 to the 1st scope
 use crate::{constant::*, error::*, states::*};
 
-declare_id!("");
+declare_id!("4roLsp9UCWbpm9tgj7yw94eDn6jGWJncvLq2fTbZdeWd");
 
 #[program]
 pub mod clever_todo {
@@ -22,8 +22,7 @@ pub mod clever_todo {
         pub fn initialize_user(
             ctx: Context<InitializeUser>
         ) -> Result<()> {
-            // Initialize USER_PROFILE with default data
-            
+            // Initialize USER_PROFILE with default data           
         }
 
 
