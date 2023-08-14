@@ -25,11 +25,11 @@ pub mod clever_todo {
             // Initialize USER_PROFILE with default data
             let user_profile = &mut ctx.accounts.user_profile; // declared user_profile var as the val from InitializeUser struct
 
-            user_profile.authority = ctx.acccounts.authority.key(); 
-            
+            user_profile.authority = ctx.accounts.authority.key(); 
             user_profile.last_todo = 0;
-
             user_profile.todo_count = 0;
+
+            Ok(())
         }
 
 
