@@ -6,11 +6,11 @@ describe("to-do-d-app", () => {
   // Configure the client to use the local cluster.
   anchor.setProvider(anchor.AnchorProvider.env());
 
-  const program = anchor.workspace.ToDoDApp as Program<CleverTodo>;
+  const program = anchor.workspace.CleverTodo as Program<CleverTodo>;
 
   it("Is initialized!", async () => {
     // Add your test here.
-    const tx = await program.methods.initializeUser().rpc();
+    const tx = await program.methods.initialize().rpc();
     console.log("Your transaction signature", tx);
   });
 });
