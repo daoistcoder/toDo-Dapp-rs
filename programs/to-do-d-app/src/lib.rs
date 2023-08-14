@@ -31,11 +31,37 @@ pub mod clever_todo {
 
             Ok(())
         }
-
-
     
         // * ADD toDo 
             // - ADD a toDo to the blockchain
+        pub fn add_todo(
+            ctx: Context<AddTodo>,
+            _content: String,
+        ) -> Result<()> {
+            // Initialize variables
+            
+            let todo_account = &mut ctx.accounts.todo_account; 
+            let user_profile = &mut ctx.accounts.user_profile;
+
+            // Fill the toDo_account struct w/ proper values
+            todo_account.authority = ctx.accounts.authority.key();
+            todo_account.idx = user_profile.last_todo;
+            todo_account.content = _content;
+            todo_account.marked = false;
+
+            // Increase toDo idx for PDA
+            user_profile.last_todo = user_profile.last_todo
+            .checked_add(1) // check if it can be incremented by 1
+            .unwrap();
+
+            // Increase the total_todo count
+            user_profile.todo_count = user_profile.todo_count
+            .checked_add(1)
+            .unwrap();
+
+            Ok(())
+             
+        }
         
         // * MARK a toDo
             // - UPDATE the STATE of a toDo in the blockchain
@@ -60,6 +86,33 @@ pub struct InitializeUser<'info> {
     )]
     // Box -> place to store memory
     pub user_profile: Box<Account<'info, UserProfile>>,
+
+    pub system_program: Program<'info, System>,
+}
+
+// AddTodo Struct
+#[derive(Accounts)]
+#[instruction()]
+pub struct AddTodo<'info> {
+    #[account(
+        mut,
+        seeds = [USER_TAG, authority.key().as_ref()],
+        bump,
+        has_one = authority,
+    )]
+    pub user_profile: Box<Account<'info, UserProfile>>,
+
+    #[account(
+        init,
+        seeds = [TODO_TAG, authority.key().as_ref(), &[user_profile.last_todo as u8].as_ref()],
+        bump,
+        payer = authority,
+        space = std::mem::size_of::<TodoAccount>() + 8,
+    )]
+    pub todo_account: Box<Account<'info, TodoAccount>>,
+
+    #[account(mut)]
+    pub authority: Signer<'info>,
 
     pub system_program: Program<'info, System>,
 }
